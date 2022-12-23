@@ -30,22 +30,22 @@ venv\Scripts\activate
 $ pip install -r requirements.txt
 ```
 
-5. Run the app:
+6. Install the development requirements:
+```
+$ pip install -r dev-requirements.txt
+```
+
+7. Run the app:
 ```
 $ flask run
 ```
 
 ### When adding new packages
-Install the new package using pip.
-If pipreqs is already installed, go to step 2.
-
-1. Install pipreqs:
+Please note, make sure you are inside your venv.
+1. Install the package using pip.
+2. Export the package(s) to a requirements.txt file:
 ```
-$ pip install pipreqs
-```
-2. Export the packages to a requirements.txt file:
-```
-$ pipreqs 
+$ pipreqs
 ```
 
 ### Deactivating the venv
