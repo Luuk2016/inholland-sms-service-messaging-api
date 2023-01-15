@@ -1,15 +1,30 @@
+import os
 from flask import Flask
+from flask_cors import CORS
 
+from api import api_bp
+from data.db_models import db
+
+# create the app
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('CONNECTION_STRING')
+
+# setup CORS
+CORS(app, resources={
+    r"/*": {
+        "origins": ["*"]
+    }
+})
+
+# initialize the app with the extension
+db.init_app(app)
+
+# for development only, remove for production
+with app.app_context():
+    db.create_all()
+
+app.register_blueprint(api_bp)
 
 
-@app.route("/send/groups/<int:group_id>")
-def send_group(group_id):
-    """Send message to all students in one group"""
-    return f'Group: {group_id}'
-
-
-@app.route("/send/locations/<int:location_id>")
-def send_location(location_id):
-    """Send message to all students from all the groups of the location"""
-    return f'Location: {location_id}'
+if __name__ == "__main__":
+    app.run()
