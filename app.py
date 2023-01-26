@@ -7,7 +7,11 @@ from data.db_models import db
 
 # create the app
 app = Flask(__name__)
+
+# CONNECTION_STRING=postgresql://root:example@localhost:5432/inholland-sms-service;SECRET_KEY=helloworld
+os.environ["CONNECTION_STRING"] = "postgresql://root:example@localhost/inholland-sms-service"
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('CONNECTION_STRING')
+
 
 # setup CORS
 CORS(app, resources={

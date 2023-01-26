@@ -1,30 +1,52 @@
-import json
-import uuid
-
-from flask import Flask, jsonify, Blueprint
+from urllib import request
 import pika
+from flask import Flask, request, jsonify, Blueprint
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import asc
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from marshmallow import ValidationError
 
 from data.db_models import SMSMessage, Location, Group, Student
+from data.validation_schemes import MessageValidationSchema
 
 app = Flask(__name__)
 api_bp = Blueprint('api', __name__, url_prefix='/')
 
+db = SQLAlchemy()
 
-@app.route("/send/groups/<int:group_id>", methods=['POST'])
+
+@api_bp.route("/send/groups/<int:group_id>", methods=['POST'])
 def send_group(group_id):
     """Send message to all students in one group"""
-    get_group("")
-    message = SMSMessage("Test", "message", "nr", "nr")
-    send_message_to_queue(message)
-    return f'SMS send to group: {group_id}'
+    try:
+        data = MessageValidationSchema().load(request.json)
+
+        students = get_students_from_group("6a6a1630-e4e8-4163-9954-1977c8d87012")
+        for student in students[0]:
+            send_message_to_queue(SMSMessage("test", data["Message"], data["From_phone_number"], student.phone_number))
+
+        return f'SMS send to group: '
+
+    except ValidationError as err:
+        return jsonify(err.messages), 400
 
 
-@app.route("/send/locations/<int:location_id>", methods=['POST'])
+@api_bp.route("/send/locations/<uuid:location_id>", methods=['POST'])
 def send_location(location_id):
     """Send message to all students from all the groups of the location"""
-    return f'Location: {location_id}'
+    try:
+        data = MessageValidationSchema().load(request.json)
+
+        groups = get_groups_from_locations(location_id)
+        for group in groups:
+            students = get_students_from_group(group.id)
+            for student in students:
+                send_message_to_queue(SMSMessage("test", data["Message"], data["From_phone_number"], student.phone_number))
+
+        return f'SMS send to groups: '
+
+    except ValidationError as err:
+        return jsonify(err.messages), 400
 
 
 def send_message_to_queue(message: SMSMessage):
@@ -35,34 +57,6 @@ def send_message_to_queue(message: SMSMessage):
                           routing_key='SMSQueue',
                           body=message.toJson())
     connection.close()
-
-
-def get_group(group_id):
-    """Returns a specific group"""
-    try:
-        specific_group = Group.query.get(group_id)
-
-        if not specific_group:
-            return f"A group with id \"{group_id}\" doesn't exist.", 404
-
-        return jsonify(specific_group), 200
-
-    except SQLAlchemyError:
-        return "Group couldn't be retrieved", 400
-
-
-def get_location(location_id):
-    """Returns a specific location"""
-    try:
-        specific_location = Location.query.get(location_id)
-
-        if not specific_location:
-            return f"A location with id \"{location_id}\" doesn't exist.", 404
-
-        return jsonify(specific_location), 200
-
-    except SQLAlchemyError:
-        return "Location couldn't be retrieved", 400
 
 
 def get_students_from_group(group_id):
@@ -77,7 +71,7 @@ def get_students_from_group(group_id):
         if len(students) == 0:
             return "No students could be found", 200
 
-        return jsonify(students), 200
+        return students
 
     except SQLAlchemyError:
         return "Students couldn't be retrieved", 400
@@ -97,7 +91,7 @@ def get_groups_from_locations(location_id):
             .order_by(asc(Group.name)) \
             .all()
 
-        return jsonify(groups), 200
+        return groups
 
     except SQLAlchemyError:
         return "Groups couldn't be retrieved", 400
