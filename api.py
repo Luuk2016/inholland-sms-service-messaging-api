@@ -1,6 +1,6 @@
 from urllib import request
 import pika
-from flask import Flask, jsonify, Blueprint
+from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import asc
 from sqlalchemy.exc import SQLAlchemyError
@@ -23,7 +23,11 @@ def send_group(group_id):
         students = get_students_from_group(group_id)
         for student in students:
             send_message_to_queue(
-                SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number)
+                SMSMessage(
+                    data["Scheduled_at"],
+                    data["Message"],
+                    data["From_phone_number"],
+                    student.phone_number)
             )
 
         return 'SMS send'
@@ -42,7 +46,11 @@ def send_location(location_id):
             students = get_students_from_group(group.id)
             for student in students:
                 send_message_to_queue(
-                    SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number)
+                    SMSMessage(
+                        data["Scheduled_at"],
+                        data["Message"],
+                        data["From_phone_number"],
+                        student.phone_number)
                 )
 
         return 'SMS send'
@@ -98,4 +106,3 @@ def get_groups_from_locations(location_id):
 
     except SQLAlchemyError:
         return "Groups couldn't be retrieved", 400
-

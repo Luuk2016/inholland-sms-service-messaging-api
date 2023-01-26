@@ -10,7 +10,7 @@ db = SQLAlchemy()
 bcrypt = Bcrypt()
 
 
-class SMSMessage:
+class SMSMessage(object):
     """The message that is put in the queue"""
     def __init__(self, scheduled_at, message, from_number, to_number):
         self.scheduled_at = scheduled_at
@@ -27,8 +27,7 @@ def json_default(value):
     """Json default"""
     if isinstance(value, (datetime.date, datetime.datetime)):
         return value.isoformat()
-    else:
-        return value.__dict__
+    return value.__dict__
 
 
 @dataclass
@@ -79,4 +78,3 @@ class Student(db.Model):
         self.group_id = group_id
         self.name = name
         self.phone_number = phone_number
-
