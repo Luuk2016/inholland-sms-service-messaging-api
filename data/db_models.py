@@ -1,10 +1,8 @@
 import json
-import os
 import uuid
 from dataclasses import dataclass
 
 import datetime
-import jwt
 from sqlalchemy.dialects.postgresql import UUID
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -20,8 +18,15 @@ class SMSMessage:
         self.fromPhoneNumber = from_number
         self.toPhoneNumber = to_number
 
-    def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+    def to_json(self):
+        return json.dumps(self, default=json_default)
+
+
+def json_default(value):
+    if isinstance(value, (datetime.date, datetime.datetime)):
+        return value.isoformat()
+    else:
+        return value.__dict__
 
 
 @dataclass

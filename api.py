@@ -15,15 +15,14 @@ api_bp = Blueprint('api', __name__, url_prefix='/')
 db = SQLAlchemy()
 
 
-@api_bp.route("/send/groups/<int:group_id>", methods=['POST'])
+@api_bp.route("/send/groups/<uuid:group_id>", methods=['POST'])
 def send_group(group_id):
     """Send message to all students in one group"""
     try:
         data = MessageValidationSchema().load(request.json)
-
-        students = get_students_from_group("6a6a1630-e4e8-4163-9954-1977c8d87012")
-        for student in students[0]:
-            send_message_to_queue(SMSMessage("test", data["Message"], data["From_phone_number"], student.phone_number))
+        students = get_students_from_group(group_id)
+        for student in students:
+            send_message_to_queue(SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number))
 
         return f'SMS send to group: '
 
@@ -36,12 +35,11 @@ def send_location(location_id):
     """Send message to all students from all the groups of the location"""
     try:
         data = MessageValidationSchema().load(request.json)
-
         groups = get_groups_from_locations(location_id)
         for group in groups:
             students = get_students_from_group(group.id)
             for student in students:
-                send_message_to_queue(SMSMessage("test", data["Message"], data["From_phone_number"], student.phone_number))
+                send_message_to_queue(SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number))
 
         return f'SMS send to groups: '
 
@@ -50,12 +48,13 @@ def send_location(location_id):
 
 
 def send_message_to_queue(message: SMSMessage):
+    print(message.to_json())
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 
     channel.basic_publish(exchange='',
                           routing_key='SMSQueue',
-                          body=message.toJson())
+                          body=message.to_json())
     connection.close()
 
 
