@@ -1,9 +1,9 @@
 from urllib import request
 import pika
-from flask import Flask, request, jsonify, Blueprint
+from flask import Flask, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import asc
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError
 from marshmallow import ValidationError
 
 from data.db_models import SMSMessage, Location, Group, Student
@@ -22,9 +22,11 @@ def send_group(group_id):
         data = MessageValidationSchema().load(request.json)
         students = get_students_from_group(group_id)
         for student in students:
-            send_message_to_queue(SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number))
+            send_message_to_queue(
+                SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number)
+            )
 
-        return f'SMS send to group: '
+        return 'SMS send'
 
     except ValidationError as err:
         return jsonify(err.messages), 400
@@ -39,15 +41,18 @@ def send_location(location_id):
         for group in groups:
             students = get_students_from_group(group.id)
             for student in students:
-                send_message_to_queue(SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number))
+                send_message_to_queue(
+                    SMSMessage(data["Scheduled_at"], data["Message"], data["From_phone_number"], student.phone_number)
+                )
 
-        return f'SMS send to groups: '
+        return 'SMS send'
 
     except ValidationError as err:
         return jsonify(err.messages), 400
 
 
 def send_message_to_queue(message: SMSMessage):
+    """Put the message in the queue"""
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 
@@ -93,3 +98,4 @@ def get_groups_from_locations(location_id):
 
     except SQLAlchemyError:
         return "Groups couldn't be retrieved", 400
+

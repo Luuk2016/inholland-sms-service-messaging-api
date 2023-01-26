@@ -9,4 +9,3 @@ class MessageValidationSchema(Schema):
     Message = fields.Str(required=True, validate=validate.Length(min=2))
     # noinspection PyTypeChecker
     From_phone_number = fields.Str(required=True, validate=validate.Length(min=8))
-

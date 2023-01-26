@@ -1,7 +1,6 @@
 import json
 import uuid
 from dataclasses import dataclass
-
 import datetime
 from sqlalchemy.dialects.postgresql import UUID
 from flask_sqlalchemy import SQLAlchemy
@@ -12,17 +11,20 @@ bcrypt = Bcrypt()
 
 
 class SMSMessage:
+    """The message that is put in the queue"""
     def __init__(self, scheduled_at, message, from_number, to_number):
-        self.scheduledAt = scheduled_at
-        self.message = message,
-        self.fromPhoneNumber = from_number
-        self.toPhoneNumber = to_number
+        self.scheduled_at = scheduled_at
+        self.message = message
+        self.from_phone_number = from_number
+        self.to_phone_number = to_number
 
     def to_json(self):
+        """Message to Json"""
         return json.dumps(self, default=json_default)
 
 
 def json_default(value):
+    """Json default"""
     if isinstance(value, (datetime.date, datetime.datetime)):
         return value.isoformat()
     else:
@@ -77,3 +79,4 @@ class Student(db.Model):
         self.group_id = group_id
         self.name = name
         self.phone_number = phone_number
+
