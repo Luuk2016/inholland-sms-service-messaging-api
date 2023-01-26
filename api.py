@@ -48,7 +48,6 @@ def send_location(location_id):
 
 
 def send_message_to_queue(message: SMSMessage):
-    print(message.to_json())
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 
