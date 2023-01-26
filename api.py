@@ -1,4 +1,3 @@
-from urllib import request
 import pika
 from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy

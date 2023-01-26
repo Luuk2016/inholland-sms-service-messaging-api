@@ -10,7 +10,7 @@ db = SQLAlchemy()
 bcrypt = Bcrypt()
 
 
-class SMSMessage(object):
+class SMSMessage:  # pylint: disable=too-few-public-methods
     """The message that is put in the queue"""
     def __init__(self, scheduled_at, message, from_number, to_number):
         self.scheduled_at = scheduled_at
