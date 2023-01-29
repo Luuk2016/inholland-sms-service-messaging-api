@@ -66,9 +66,7 @@ def send_message_to_queue(message: SMSMessage):
         os.environ.get('QUEUE_CONNECTION_URL')))
     channel = connection.channel()
 
-    channel.basic_publish(exchange='',
-                          routing_key='SMSQueue',
-                          body=message.to_json())
+    channel.basic_publish(exchange='', routing_key='SMSQueue', body=message.to_json())
     connection.close()
 
 
