@@ -1,3 +1,5 @@
+import os
+
 import pika
 from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
@@ -60,7 +62,7 @@ def send_location(location_id):
 
 def send_message_to_queue(message: SMSMessage):
     """Put the message in the queue"""
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ.get('QUEUE_CONNECTION_URL')))
     channel = connection.channel()
 
     channel.basic_publish(exchange='',
