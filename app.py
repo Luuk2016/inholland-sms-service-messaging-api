@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_cors import CORS
+from prometheus_flask_exporter import PrometheusMetrics
 from api import api_bp
 from data.db_models import db
 
@@ -8,6 +9,8 @@ from data.db_models import db
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DB_CONNECTION_STRING')
 
+metrics = PrometheusMetrics(app)
+metrics.info("app_info", "InHolland SMS Service Messaging API", version="1.0.0")
 
 # setup CORS
 CORS(
