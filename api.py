@@ -33,7 +33,7 @@ def send_group(group_id):
                     student.phone_number)
             )
 
-        return 'SMS send'
+        return 'SMS sent', 201
 
     except ValidationError as err:
         return jsonify(err.messages), 400
@@ -57,7 +57,7 @@ def send_location(location_id):
                         student.phone_number)
                 )
 
-        return 'SMS send'
+        return 'SMS sent', 201
 
     except ValidationError as err:
         return jsonify(err.messages), 400
@@ -97,7 +97,7 @@ def get_students_from_group(group_id):
         if len(students) == 0:
             return "No students could be found", 200
 
-        return students
+        return students, 200
 
     except SQLAlchemyError:
         return "Students couldn't be retrieved", 400
@@ -117,7 +117,7 @@ def get_groups_from_locations(location_id):
             .order_by(asc(Group.name)) \
             .all()
 
-        return groups
+        return groups, 200
 
     except SQLAlchemyError:
         return "Groups couldn't be retrieved", 400
