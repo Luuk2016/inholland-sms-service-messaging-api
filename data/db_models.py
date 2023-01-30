@@ -15,7 +15,6 @@ bcrypt = Bcrypt()
 
 class SMSMessage:  # pylint: disable=too-few-public-methods
     """The message that is put in the queue"""
-
     def __init__(self, ScheduledAt, Message, FromPhoneNumber, ToPhoneNumber):  # pylint: disable=C0103
         self.ScheduledAt = ScheduledAt  # pylint: disable=C0103
         self.Message = Message  # pylint: disable=C0103
