@@ -65,8 +65,20 @@ def send_location(location_id):
 
 def send_message_to_queue(message: SMSMessage):
     """Put the message in the queue"""
-    connection = pika.BlockingConnection(pika.ConnectionParameters(
-        os.environ.get('RABBITMQ_CONNECTION_STRING')))
+    credentials = pika.PlainCredentials(
+        username=os.environ.get('RABBITMQ_USERNAME', 'guest'),
+        password=os.environ.get('RABBITMQ_PASSWORD', 'guest')
+    )
+
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            os.environ.get('RABBITMQ_HOST', 'localhost'),
+            5672,
+            '/',
+            credentials
+        )
+    )
+
     channel = connection.channel()
 
     channel.basic_publish(exchange='', routing_key='SMSQueue', body=message.to_json())
