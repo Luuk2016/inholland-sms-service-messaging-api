@@ -1,8 +1,8 @@
 import os
 from flask import Flask
 from flask_cors import CORS
-from api import api_bp
 from prometheus_flask_exporter import PrometheusMetrics
+from api import api_bp
 from data.db_models import db
 
 # create the app
