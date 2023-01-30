@@ -15,11 +15,12 @@ bcrypt = Bcrypt()
 
 class SMSMessage:  # pylint: disable=too-few-public-methods
     """The message that is put in the queue"""
-    def __init__(self, scheduled_at, message, from_number, to_number):
-        self.scheduled_at = scheduled_at
-        self.message = message
-        self.from_phone_number = from_number
-        self.to_phone_number = to_number
+
+    def __init__(self, ScheduledAt, Message, FromPhoneNumber, ToPhoneNumber):  # pylint: disable=C0103
+        self.ScheduledAt = ScheduledAt  # pylint: disable=C0103
+        self.Message = Message  # pylint: disable=C0103
+        self.FromPhoneNumber = FromPhoneNumber  # pylint: disable=C0103
+        self.ToPhoneNumber = ToPhoneNumber  # pylint: disable=C0103
 
     def to_json(self):
         """Message to Json"""
