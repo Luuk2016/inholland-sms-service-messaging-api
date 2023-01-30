@@ -41,9 +41,9 @@ $ flask run
 #### Required environment variables
 To run the app, add the following to your environment variables:
 ```
-"CONNECTION_STRING" => "postgresql://USER:PASSWORD@HOST:PORT/DBNAME"
+"DB_CONNECTION_STRING" => "postgresql://USER:PASSWORD@HOST:PORT/DBNAME"
+"RABBITMQ_CONNECTION_STRING" => "localhost"
 "SECRET_KEY" => "secret"
-"QUEUE_CONNECTION_URL" => "localhost"
 ```
 
 #### Add new packages
