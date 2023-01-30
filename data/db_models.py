@@ -1,7 +1,10 @@
 import json
+import os
 import uuid
 from dataclasses import dataclass
 import datetime
+
+import jwt
 from sqlalchemy.dialects.postgresql import UUID
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -78,3 +81,33 @@ class Student(db.Model):
         self.group_id = group_id
         self.name = name
         self.phone_number = phone_number
+
+
+@dataclass
+class Lecturer(db.Model):
+    """The lecturer class is used to store the various lecturers"""
+    id: UUID(as_uuid=True)  # pylint: disable=c0103
+    email: str
+    password: str
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, unique=False, nullable=False)
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = bcrypt.generate_password_hash(
+            password
+        ).decode()
+
+    @staticmethod
+    def decode_token(token):
+        """Decode JWT token payload"""
+        try:
+            payload = jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=['HS256'])
+
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return 'Signature expired. Please log in again'
+        except jwt.InvalidTokenError:
+            return 'Invalid token. Please log in again'

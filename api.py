@@ -9,6 +9,7 @@ from marshmallow import ValidationError
 
 from data.db_models import SMSMessage, Location, Group, Student
 from data.validation_schemes import MessageValidationSchema
+from middleware.auth import auth_required
 
 app = Flask(__name__)
 api_bp = Blueprint('api', __name__, url_prefix='/')
@@ -17,6 +18,7 @@ db = SQLAlchemy()
 
 
 @api_bp.route("/send/groups/<uuid:group_id>", methods=['POST'])
+@auth_required
 def send_group(group_id):
     """Send message to all students in one group"""
     try:
@@ -38,6 +40,7 @@ def send_group(group_id):
 
 
 @api_bp.route("/send/locations/<uuid:location_id>", methods=['POST'])
+@auth_required
 def send_location(location_id):
     """Send message to all students from all the groups of the location"""
     try:
